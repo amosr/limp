@@ -24,11 +24,6 @@ library
         Numeric.Limp.Canon.Convert
         Numeric.Limp.Canon
 
-        --Numeric.Limp.Slack.Linear
-        --Numeric.Limp.Slack.Constraint
-        --Numeric.Limp.Slack.Convert
-        --Numeric.Limp.Slack
-
   -- other-modules:       
   build-depends:
         base,
