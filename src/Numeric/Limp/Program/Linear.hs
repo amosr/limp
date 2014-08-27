@@ -113,7 +113,7 @@ infix  7 .*
 infixl 6 .+.
 infixl 6 .-.
 
-eval :: Rep c => Assignment z r c -> Linear z r c k -> KRep k c
+eval :: (Rep c, Ord z, Ord r) => Assignment z r c -> Linear z r c k -> KRep k c
 eval a (LZ ls c)
  = sum (map get ls) + c
  where
@@ -124,7 +124,7 @@ eval a (LR ls c)
  where
   get (l, co) = zrOf a l * co
 
-evalR :: Rep c => Assignment z r c -> Linear z r c k -> R c
+evalR :: (Rep c, Ord z, Ord r) => Assignment z r c -> Linear z r c k -> R c
 evalR a l@(LZ{}) = fromZ (eval a l)
 evalR a l@(LR{}) =        eval a l
 

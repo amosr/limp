@@ -16,7 +16,7 @@ mkLinear zrs c
  = Linear (M.fromList zrs) c
 
 
-evalR :: Rep c => Assignment z r c -> Linear z r c -> R c
+evalR :: (Rep c, Ord z, Ord r) => Assignment z r c -> Linear z r c -> R c
 evalR a (Linear ls c)
  = sum (map get $ M.toList ls) + c
  where

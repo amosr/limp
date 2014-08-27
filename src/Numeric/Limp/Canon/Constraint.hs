@@ -10,7 +10,7 @@ data Constraint z r c
 data Constraint1 z r c
  = C1 (Maybe (R c)) (Linear z r c) (Maybe (R c))
 
-check :: Rep c => Assignment z r c -> Constraint z r c -> Bool
+check :: (Rep c, Ord z, Ord r) => Assignment z r c -> Constraint z r c -> Bool
 check a (Constraint cs) = all go cs
  where
   ev l = evalR a l

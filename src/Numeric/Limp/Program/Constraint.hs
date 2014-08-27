@@ -27,7 +27,7 @@ infix  5 :>
 infix  4 :!
 infixr 3 :&&
 
-check :: Rep c => Assignment z r c -> Constraint z r c -> Bool
+check :: (Rep c, Ord z, Ord r) => Assignment z r c -> Constraint z r c -> Bool
 check ass = go
  where
   -- ev :: Linear z r c k -> R c
