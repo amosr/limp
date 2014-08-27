@@ -22,16 +22,12 @@ type family KRep (a :: K) :: * -> * where
  KRep KZ = Z
  KRep KR = R
 
--- | Any integral linear function can be made into a real linear function
-krOfKz :: Rep c => Linear z r c KZ -> Linear z r c KR
-krOfKz (LZ ls co)
- = LR (map go ls) (fromZ co)
- where
-  go (z',c') = (Left z', fromZ c')
 
 -- | Any linear function can be made into a real, as it is the upper bound / top
 toR :: Rep c => Linear z r c k -> Linear z r c KR
-toR l@(LZ{}) = krOfKz l
+toR (LZ ls co) = LR (map go ls) (fromZ co)
+ where
+  go (z',c') = (Left z', fromZ c')
 toR l@(LR{}) =        l
 
 
@@ -90,12 +86,6 @@ neg (LR ls c)
 (*.) :: Rep c => KRep k c -> Linear z r c k -> Linear z r c k
 (*.) = flip (.*)
 
-add_KZ :: Rep c => Linear z r c KZ -> Linear z r c KZ -> Linear z r c KZ
-add_KZ (LZ ls lc) (LZ rs rc) = LZ (ls ++ rs) (lc + rc)
-
-add_KR :: Rep c => Linear z r c KR -> Linear z r c KR -> Linear z r c KR
-add_KR (LR ls lc) (LR rs rc) = LR (ls ++ rs) (lc + rc)
-
 
 (.+.) :: Rep c => Linear z r c k1 -> Linear z r c k2 -> Linear z r c (KMerge k1 k2)
 (.+.) a b
@@ -104,6 +94,13 @@ add_KR (LR ls lc) (LR rs rc) = LR (ls ++ rs) (lc + rc)
     (LR{}, LZ{}) -> add_KR      a (toR b)
     (LZ{}, LR{}) -> add_KR (toR a)     b
     (LR{}, LR{}) -> add_KR      a      b
+ where
+  add_KZ :: Rep c => Linear z r c KZ -> Linear z r c KZ -> Linear z r c KZ
+  add_KZ (LZ ls lc) (LZ rs rc) = LZ (ls ++ rs) (lc + rc)
+
+  add_KR :: Rep c => Linear z r c KR -> Linear z r c KR -> Linear z r c KR
+  add_KR (LR ls lc) (LR rs rc) = LR (ls ++ rs) (lc + rc)
+
 
 
 (.-.) :: Rep c => Linear z r c k1 -> Linear z r c k2 -> Linear z r c (KMerge k1 k2)
@@ -130,3 +127,4 @@ eval a (LR ls c)
 evalR :: Rep c => Assignment z r c -> Linear z r c k -> R c
 evalR a l@(LZ{}) = fromZ (eval a l)
 evalR a l@(LR{}) =        eval a l
+

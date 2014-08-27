@@ -22,7 +22,8 @@ rOf (Assignment _ rs) r
 zrOf :: Rep c => Assignment z r c -> Either z r -> R c
 zrOf a = either (fromZ . zOf a) (rOf a)
 
-newtype IntDouble = IntDouble ()
+data IntDouble
+
 instance Rep IntDouble where
  newtype Z IntDouble = Z Int
     deriving (Ord,Eq,Show,Read,Integral,Real,Num,Enum)

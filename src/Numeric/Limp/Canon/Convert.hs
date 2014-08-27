@@ -1,10 +1,19 @@
 module Numeric.Limp.Canon.Convert where
 
 import Numeric.Limp.Rep
+
 import Numeric.Limp.Canon.Constraint
 import Numeric.Limp.Canon.Linear
+import Numeric.Limp.Canon.Program
+
+import qualified Numeric.Limp.Program.Bounds     as P
 import qualified Numeric.Limp.Program.Constraint as P
-import qualified Numeric.Limp.Program.Linear as P
+import qualified Numeric.Limp.Program.Linear     as P
+import qualified Numeric.Limp.Program.Program    as P
+
+import Control.Applicative
+import Control.Lens
+import qualified Data.Map as M
 
 linear :: (Rep c, Ord z, Ord r) => P.Linear z r c k -> Linear z r c
 linear (P.LZ ls co)
@@ -19,9 +28,9 @@ constraint z
  = Constraint $ go z
  where
   -- a <= b <==> b - a >= 0
-  cle l r = C1 (linear (r P..-. l)) CTGe0
+  cle l r = C1 (Just 0) (linear (r P..-. l)) Nothing
   -- a == b <==> a - b == 0
-  ceq l r = C1 (linear (l P..-. r)) CTEq0
+  ceq l r = C1 (Just 0) (linear (l P..-. r)) (Just 0)
 
   go (l P.:== r)
    = [ceq l r]
@@ -49,4 +58,45 @@ constraint z
 
 -- lemma: check a (constraint c) == P.check a c
 
+
+program :: (Rep c, Ord z, Ord r) => P.Program z r c -> Program z r c
+program p
+ = Program obj constr bnds
+ where
+
+  obj
+   = case p ^. P.direction of
+        P.Minimise -> linear $       obj_orig
+        P.Maximise -> linear $ P.neg obj_orig
+  obj_orig
+   = p ^. P.objective
+
+  constr
+   = constraint $ p ^. P.constraints
+
+  bnds
+   = M.fromListWith merge
+   $ map extract
+   $ p ^. P.bounds
+
+  merge (l1,u1) (l2,u2)
+   = ( mmaybe max l1 l2
+     , mmaybe min u1 u2 )
+
+  mmaybe f a b
+   = case (a,b) of
+     (Nothing, Nothing)
+      -> Nothing
+     (Nothing, Just b')
+      -> Just $ b'
+     (Just a', Nothing)
+      -> Just $ a'
+     (Just a', Just b')
+      -> Just $ f a' b'
+
+  extract :: Rep c => P.Bounds z r c -> (Either z r, (Maybe (R c), Maybe (R c)))
+  extract (P.BoundZ (l,k,u))
+   = (Left k, (fromZ <$> l, fromZ <$> u))
+  extract (P.BoundR (l,k,u))
+   = (Right k, (l,u))
 

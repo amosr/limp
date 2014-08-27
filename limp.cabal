@@ -14,14 +14,16 @@ library
   exposed-modules:
         Numeric.Limp.Rep
 
-        Numeric.Limp.Program.Linear
+        Numeric.Limp.Program.Bounds
         Numeric.Limp.Program.Constraint
+        Numeric.Limp.Program.Linear
         Numeric.Limp.Program.Program
         Numeric.Limp.Program
 
         Numeric.Limp.Canon.Linear
         Numeric.Limp.Canon.Constraint
         Numeric.Limp.Canon.Convert
+        Numeric.Limp.Canon.Program
         Numeric.Limp.Canon
 
   -- other-modules:       
@@ -36,18 +38,3 @@ library
   default-language: Haskell2010
   default-extensions:       TemplateHaskell TypeFamilies FlexibleContexts GeneralizedNewtypeDeriving DataKinds GADTs RankNTypes
 
-Test-Suite test-limp
-  hs-source-dirs: test src
-  type:           exitcode-stdio-1.0
-  main-is:        Main.hs
-  -- other-modules:       
-  build-depends:
-        base,
-        containers,
-        QuickCheck,
-        test-framework,
-        test-framework-th,
-        test-framework-quickcheck2
-  ghc-options:      -Wall -fno-warn-orphans -O2
-  default-language: Haskell2010
-  extensions:       TemplateHaskell
