@@ -15,22 +15,35 @@ import Control.Applicative
 import Control.Lens
 import qualified Data.Map as M
 
-linear :: (Rep c, Ord z, Ord r) => P.Linear z r c k -> Linear z r c
+linear :: (Rep c, Ord z, Ord r) => P.Linear z r c k -> (Linear z r c, R c)
 linear (P.LZ ls co)
- = mkLinear (map conv ls) (fromZ co)
+ = (mkLinear $ map conv ls, fromZ co)
  where
   conv (z,c) = (Left z, fromZ c)
 linear (P.LR ls co)
- = mkLinear ls co
+ = (mkLinear ls, co)
 
 constraint :: (Rep c, Ord z, Ord r) => P.Constraint z r c -> Constraint z r c
 constraint z
  = Constraint $ go z
  where
   -- a <= b <==> b - a >= 0
-  cle l r = C1 (Just 0) (linear (r P..-. l)) Nothing
+  -- x + 1 <= y     ==> 1 <= y - x
+  -- x + c <= y + d ==> -(d - c) <= y - x
+  --
+  -- x + c <= y + d
+  --     c <= y + d - x
+  -- c - d <= y - x
+  -- -(d-c)<= y - x
+  --
+  cle l r
+   = let (lin, co) = linear (r P..-. l)
+     in  C1 (Just (-co)) lin Nothing
+
   -- a == b <==> a - b == 0
-  ceq l r = C1 (Just 0) (linear (l P..-. r)) (Just 0)
+  ceq l r
+   = let (lin, co) = linear (r P..-. l)
+     in  C1 (Just (-co)) lin (Just (-co))
 
   go (l P.:== r)
    = [ceq l r]
@@ -66,8 +79,8 @@ program p
 
   obj
    = case p ^. P.direction of
-        P.Minimise -> linear $       obj_orig
-        P.Maximise -> linear $ P.neg obj_orig
+        P.Minimise -> fst $ linear $       obj_orig
+        P.Maximise -> fst $ linear $ P.neg obj_orig
   obj_orig
    = p ^. P.objective
 
