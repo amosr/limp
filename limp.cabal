@@ -1,8 +1,8 @@
 name:                limp
 version:             0.1.0.0
 synopsis:            representation of Integer Linear Programs
-description:         so far, this package just provides two representations for linear programs: Numeric.Limp.Program, which is what I expect end-users to use, and
-                     Numeric.Limp.Canon, which is simpler, but would be less nice for writing linear programs.
+description:         so far, this package just provides two representations for linear programs: "Numeric.Limp.Program", which is what I expect end-users to use, and
+                     "Numeric.Limp.Canon", which is simpler, but would be less nice for writing linear programs.
                      see the limp-cbc package for a simple solver.
 
 license:             MIT
@@ -26,8 +26,10 @@ library
 
         Numeric.Limp.Program.Bounds
         Numeric.Limp.Program.Constraint
+        Numeric.Limp.Program.Eval
         Numeric.Limp.Program.Linear
         Numeric.Limp.Program.Program
+        Numeric.Limp.Program.ResultKind
         Numeric.Limp.Program
 
         Numeric.Limp.Canon.Linear

@@ -1,38 +1,33 @@
-module Numeric.Limp.Program.Linear where
+-- | Representation, constructors and limited arithmetic on linear functions.
+--
+-- The linear function is indexed by its result type: either purely integer (@KZ@) or mixed/real (@KR@).
+-- This index is used to allow strictly-less-than constraints only on integer functions,
+-- and to allow retrieving integer values from purely integer functions.
+--
+module Numeric.Limp.Program.Linear
+    ( Linear(..)
+    , toR
+
+    , z, z1
+    , r, r1
+
+    , con, conZ, conR
+    , c0, c1
+
+    , neg
+    , (.*), (*.)
+    , (.+.), (.-.) )
+     where
 import Numeric.Limp.Rep
+import Numeric.Limp.Program.ResultKind
 
--- import Control.Lens
-
--- | The kind of a linear function:
--- it can be integral (Z) or real (R).
-data K = KZ | KR
-
-data Linear z r c k where
- LZ :: [(z, Z c)]          -> (Z c) -> Linear z r c KZ
- LR :: [(Either z r, R c)] -> (R c) -> Linear z r c KR
-
--- | The upper bound of two kinds is real, unless both are integral
-type family KMerge (a :: K) (b :: K) :: K where
- KMerge KZ KZ = KZ
- KMerge KR b  = KR
- KMerge a  KR = KR
-
--- | The upper bound of two kinds is real, unless both are integral
-type family KRep (a :: K) :: * -> * where
- KRep KZ = Z
- KRep KR = R
-
-
--- | Any linear function can be made into a real, as it is the upper bound / top
+-- | Any linear function can be converted into a real linear function.
 toR :: Rep c => Linear z r c k -> Linear z r c KR
 toR (LZ ls co) = LR (map go ls) (fromZ co)
  where
   go (z',c') = (Left z', fromZ c')
 toR l@(LR{}) =        l
 
-
-------------------------
--- Creation functions
 
 -- | Integral variable
 z :: Rep c => z -> Z c -> Linear z r c KZ
@@ -55,16 +50,28 @@ r1 r'
  = r r' 1
 
 
--- | An integral constant
+-- | An integral constant summand
 con :: Rep c => Z c -> Linear z r c KZ
 con c'
  = LZ [] c'
 
+-- | An integral constant summand
+conZ :: Rep c => Z c -> Linear z r c KZ
+conZ = con
+
+-- | Constant @0@
 c0 :: Rep c => Linear z r c KZ
 c0 = con 0
+-- | Constant @1@
 c1 :: Rep c => Linear z r c KZ
 c1 = con 1
 
+-- | A real constant
+conR :: Rep c => R c -> Linear z r c KR
+conR c'
+ = LR [] c'
+
+-- | Helper for applying function to second element of tuple
 on2 :: (b -> c) -> (a, b) -> (a, c)
 on2 f (a,b) = (a, f b)
 
@@ -77,16 +84,21 @@ neg (LR ls c)
  = LR (map (on2 negate) ls) (negate c)
 
 
+-- | Multiply a linear function by some constant.
+--
+-- Note that you cannot multiply a linear function by another linear function, as the result would likely be non-linear!
 (.*) :: Rep c => Linear z r c k -> KRep k c -> Linear z r c k
 (.*) (LZ ls c) z'
  = LZ (map (on2 (*z')) ls) (c * z')
 (.*) (LR ls c) r'
  = LR (map (on2 (*r')) ls) (c * r')
 
+-- | Multiply a linear function by some constant.
 (*.) :: Rep c => KRep k c -> Linear z r c k -> Linear z r c k
 (*.) = flip (.*)
 
 
+-- | Add two linear functions together. They can have different result types.
 (.+.) :: Rep c => Linear z r c k1 -> Linear z r c k2 -> Linear z r c (KMerge k1 k2)
 (.+.) a b
  = case (a,b) of
@@ -103,6 +115,7 @@ neg (LR ls c)
 
 
 
+-- | Subtract one linear function from another. They can have different result types.
 (.-.) :: Rep c => Linear z r c k1 -> Linear z r c k2 -> Linear z r c (KMerge k1 k2)
 (.-.) a b
  = a .+. neg b
@@ -112,19 +125,4 @@ infix  7 *.
 infix  7 .*
 infixl 6 .+.
 infixl 6 .-.
-
-eval :: (Rep c, Ord z, Ord r) => Assignment z r c -> Linear z r c k -> KRep k c
-eval a (LZ ls c)
- = sum (map get ls) + c
- where
-  get (l, co) = zOf a l * co
-
-eval a (LR ls c)
- = sum (map get ls) + c
- where
-  get (l, co) = zrOf a l * co
-
-evalR :: (Rep c, Ord z, Ord r) => Assignment z r c -> Linear z r c k -> R c
-evalR a l@(LZ{}) = fromZ (eval a l)
-evalR a l@(LR{}) =        eval a l
 

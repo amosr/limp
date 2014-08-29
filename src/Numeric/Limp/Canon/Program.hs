@@ -1,4 +1,4 @@
-{-# LANGUAGE TemplateHaskell #-}
+-- | Canon representation of linear program
 module Numeric.Limp.Canon.Program where
 
 import Numeric.Limp.Canon.Linear
@@ -10,6 +10,8 @@ import qualified Data.Map as M
 import Data.Set (Set)
 import qualified Data.Set as S
 
+-- | A program represented by objective, constraints and bounds.
+-- There is no need for an optimisation direction; the objective is just negated.
 data Program z r c
  = Program
    { _objective     :: Linear z r c
@@ -18,6 +20,7 @@ data Program z r c
    }
 
 
+-- | Find set of all variables mentioned in program
 varsOfProgram :: (Ord z, Ord r) => Program z r c -> Set (Either z r)
 varsOfProgram p
  = S.unions

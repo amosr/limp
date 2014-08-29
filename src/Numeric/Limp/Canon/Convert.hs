@@ -1,3 +1,4 @@
+-- | Convert from "Numeric.Limp.Program" representation to simpler, so-called canonical representation.
 module Numeric.Limp.Canon.Convert where
 
 import Numeric.Limp.Rep
@@ -14,6 +15,12 @@ import qualified Numeric.Limp.Program.Program    as P
 import Control.Applicative
 import qualified Data.Map as M
 
+
+-- | Convert a Frontend 'P.Linear' into a Canon 'Linear'.
+-- Returns the constant summand as well, as Canon Linear do not have these.
+--
+-- Should satisfy that
+-- @forall a l. P.evalR a l == evalR a (fst $ linear l) + (snd $ linear l)@
 linear :: (Rep c, Ord z, Ord r) => P.Linear z r c k -> (Linear z r c, R c)
 linear (P.LZ ls co)
  = (mkLinear $ map conv ls, fromZ co)
@@ -22,6 +29,10 @@ linear (P.LZ ls co)
 linear (P.LR ls co)
  = (mkLinear ls, co)
 
+-- | Convert a Frontend 'P.Constraint' into a Canon 'Constraint'.
+--
+-- Should satisfy that
+-- @forall a c. P.check a c == check a (constraint c)@
 constraint :: (Rep c, Ord z, Ord r) => P.Constraint z r c -> Constraint z r c
 constraint z
  = Constraint $ go z
@@ -68,9 +79,21 @@ constraint z
   go  P.CTrue
    = []
 
--- lemma: check a (constraint c) == P.check a c
 
 
+-- | Convert a Frontend 'P.Program' into a Canon 'Program'.
+--
+-- If we had a solve function that worked on either, it would ideally satisfy
+-- @forall p. P.solve p == solve (program p)@
+--
+-- However, due to potential non-determinism in solving functions, it could be possible to get a different, but still optimal, solution:
+--
+-- > forall p. let aP = P.solve p
+-- >                p' = program p
+-- >                a  =   solve p'
+-- >            in P.eval aP (P._objective p) == eval a (_objective p')
+-- >            &&  check a (P._constraints p) && check ...
+--
 program :: (Rep c, Ord z, Ord r) => P.Program z r c -> Program z r c
 program p
  = Program obj constr bnds
