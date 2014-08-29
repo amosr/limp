@@ -12,7 +12,6 @@ import qualified Numeric.Limp.Program.Linear     as P
 import qualified Numeric.Limp.Program.Program    as P
 
 import Control.Applicative
-import Control.Lens
 import qualified Data.Map as M
 
 linear :: (Rep c, Ord z, Ord r) => P.Linear z r c k -> (Linear z r c, R c)
@@ -78,19 +77,19 @@ program p
  where
 
   obj
-   = case p ^. P.direction of
+   = case P._direction p of
         P.Minimise -> fst $ linear $       obj_orig
         P.Maximise -> fst $ linear $ P.neg obj_orig
   obj_orig
-   = p ^. P.objective
+   = P._objective p
 
   constr
-   = constraint $ p ^. P.constraints
+   = constraint $ P._constraints p
 
   bnds
    = M.fromListWith merge
    $ map extract
-   $ p ^. P.bounds
+   $ P._bounds p
 
   merge (l1,u1) (l2,u2)
    = ( mmaybe max l1 l2
