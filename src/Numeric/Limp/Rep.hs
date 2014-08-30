@@ -34,6 +34,8 @@ class ( Num (Z c), Ord (Z c), Eq (Z c), Integral (Z c)
 data Assignment z r c
  = Assignment (Map z (Z c)) (Map r (R c))
 
+deriving instance (Show (Z c), Show (R c), Show z, Show r) => Show (Assignment z r c)
+
 
 -- | Retrieve value of integer variable - or 0, if there is no value.
 zOf :: (Rep c, Ord z) => Assignment z r c -> z -> Z c
@@ -58,9 +60,17 @@ data IntDouble
 instance Rep IntDouble where
  -- | Automatically defer numeric operations to the native int.
  newtype Z IntDouble = Z Int
-    deriving (Ord,Eq,Show,Read,Integral,Real,Num,Enum)
+    deriving (Ord,Eq,Integral,Real,Num,Enum)
  newtype R IntDouble = R Double
-    deriving (Ord,Eq,Show,Read,Num,Enum)
+    deriving (Ord,Eq,Num,Enum)
+
+-- | Define show manually, so we can strip out the "Z" and "R" prefixes.
+instance Show (Z IntDouble) where
+ show (Z i) = show i
+
+instance Show (R IntDouble) where
+ show (R i) = show i
+
 
 
 -- | Convert a wrapped (R IntDouble) to an actual Double.
