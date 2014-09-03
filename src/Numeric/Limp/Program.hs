@@ -13,6 +13,9 @@ module Numeric.Limp.Program
     , module Numeric.Limp.Program.Linear
       -- | An entire program.
     , module Numeric.Limp.Program.Program
+      -- | Linear functions are classified as either int-valued or real-valued,
+      -- so we define @KZ@ and @KR@ as data kinds to denote this in the type.
+    , module Numeric.Limp.Program.ResultKind
     ) where
 
 import Numeric.Limp.Program.Bounds
@@ -20,4 +23,5 @@ import Numeric.Limp.Program.Constraint
 import Numeric.Limp.Program.Eval
 import Numeric.Limp.Program.Linear
 import Numeric.Limp.Program.Program
+import Numeric.Limp.Program.ResultKind
 

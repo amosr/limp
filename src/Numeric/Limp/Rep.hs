@@ -16,7 +16,7 @@ import qualified Data.Map as M
 -- This gives some minor annoyances when unpacking them. See 'unwrapR' below.
 --
 class ( Num (Z c), Ord (Z c), Eq (Z c), Integral (Z c)
-      , Num (R c), Ord (R c), Eq (R c)) => Rep c where
+      , Num (R c), Ord (R c), Eq (R c), RealFrac (R c)) => Rep c where
 
  -- | Integers
  data Z c
@@ -62,7 +62,7 @@ instance Rep IntDouble where
  newtype Z IntDouble = Z Int
     deriving (Ord,Eq,Integral,Real,Num,Enum)
  newtype R IntDouble = R Double
-    deriving (Ord,Eq,Num,Enum)
+    deriving (Ord,Eq,Num,Enum,Fractional,Real,RealFrac)
 
 -- | Define show manually, so we can strip out the "Z" and "R" prefixes.
 instance Show (Z IntDouble) where
