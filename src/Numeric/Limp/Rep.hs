@@ -51,6 +51,9 @@ rOf (Assignment _ rs) r
 zrOf :: (Rep c, Ord z, Ord r) => Assignment z r c -> Either z r -> R c
 zrOf a = either (fromZ . zOf a) (rOf a)
 
+assSize :: Assignment z r c -> Int
+assSize (Assignment mz mr)
+ = M.size mz + M.size mr
 
 
 -- | A representation that uses native 64-bit ints and 64-bit doubles.

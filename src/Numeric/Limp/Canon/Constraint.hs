@@ -16,6 +16,7 @@ data Constraint1 z r c
  -- In order to be meaningful, at least one of lower or upper bound should be @Just@.
  = C1 (Maybe (R c)) (Linear z r c) (Maybe (R c))
 
+
 -- | Check whether an assignment satisfies the constraint
 check :: (Rep c, Ord z, Ord r) => Assignment z r c -> Constraint z r c -> Bool
 check a (Constraint cs) = all go cs

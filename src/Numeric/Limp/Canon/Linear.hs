@@ -10,6 +10,9 @@ import qualified Data.Set as S
 data Linear z r c
  = Linear (M.Map (Either z r) (R c))
 
+deriving instance (Ord z, Ord r, Rep c) => Eq (Linear z r c)
+deriving instance (Ord z, Ord r, Rep c)  => Ord (Linear z r c)
+
 -- | Create linear function from list of variables and coefficients
 mkLinear :: (Ord z, Ord r)
          => [(Either z r, R c)]

@@ -28,3 +28,21 @@ varsOfProgram p
  , varsOfConstraint $ _constraints p
  , M.keysSet        $ _bounds      p ]
 
+
+-- | Merge some lower and upper bounds
+mergeBounds :: Rep c => (Maybe (R c), Maybe (R c)) -> (Maybe (R c), Maybe (R c)) -> (Maybe (R c), Maybe (R c))
+mergeBounds (l1,u1) (l2,u2)
+ = ( mmaybe max l1 l2
+   , mmaybe min u1 u2 )
+ where
+  mmaybe f a b
+   = case (a,b) of
+    (Nothing, Nothing)
+     -> Nothing
+    (Nothing, Just b')
+     -> Just $ b'
+    (Just a', Nothing)
+     -> Just $ a'
+    (Just a', Just b')
+     -> Just $ f a' b'
+

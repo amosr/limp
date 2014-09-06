@@ -110,28 +110,14 @@ program p
    = constraint $ P._constraints p
 
   bnds
-   = M.fromListWith merge
+   = M.fromListWith mergeBounds
    $ map extract
    $ P._bounds p
-
-  merge (l1,u1) (l2,u2)
-   = ( mmaybe max l1 l2
-     , mmaybe min u1 u2 )
-
-  mmaybe f a b
-   = case (a,b) of
-     (Nothing, Nothing)
-      -> Nothing
-     (Nothing, Just b')
-      -> Just $ b'
-     (Just a', Nothing)
-      -> Just $ a'
-     (Just a', Just b')
-      -> Just $ f a' b'
 
   extract :: Rep c => P.Bounds z r c -> (Either z r, (Maybe (R c), Maybe (R c)))
   extract (P.BoundZ (l,k,u))
    = (Left k, (fromZ <$> l, fromZ <$> u))
   extract (P.BoundR (l,k,u))
    = (Right k, (l,u))
+
 
