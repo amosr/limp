@@ -11,14 +11,14 @@ data Linear z r c
  = Linear (M.Map (Either z r) (R c))
 
 deriving instance (Ord z, Ord r, Rep c) => Eq (Linear z r c)
-deriving instance (Ord z, Ord r, Rep c)  => Ord (Linear z r c)
+deriving instance (Ord z, Ord r, Rep c) => Ord (Linear z r c)
 
 -- | Create linear function from list of variables and coefficients
-mkLinear :: (Ord z, Ord r)
+mkLinear :: (Ord z, Ord r, Rep c)
          => [(Either z r, R c)]
          -> Linear z r c
 mkLinear zrs
- = Linear (M.fromList zrs)
+ = Linear (M.fromListWith (+) zrs)
 
 
 -- | Evaluate linear function with given assignment
