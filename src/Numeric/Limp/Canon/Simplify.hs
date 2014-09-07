@@ -9,12 +9,19 @@ import Numeric.Limp.Canon.Simplify.Bounder
 import Numeric.Limp.Canon.Simplify.Crunch
 import Numeric.Limp.Canon.Simplify.Subst
 
-simplify :: (Ord z, Ord r, Rep c) => Program z r c -> Program z r c
+import Data.Monoid
+
+simplify :: (Ord z, Ord r, Rep c) => Program z r c -> (Assignment z r c, Program z r c)
 simplify p
+ = simplify' mempty p
+
+simplify' :: (Ord z, Ord r, Rep c) => Assignment z r c -> Program z r c -> (Assignment z r c, Program z r c)
+simplify' sub1 p
  = let p'   = crunchProgram    p
        p''  = bounderProgram   p'
-       sub  = constantsProgram p''
-   in  if   assSize sub == 0
-       then                             p''
-       else simplify $ substProgram sub p''
+       sub2 = constantsProgram p''
+   in  if   assSize sub2 == 0
+       then (sub1, p'')
+       else simplify' (sub1 <> sub2) (substProgram sub2 p'')
+
 

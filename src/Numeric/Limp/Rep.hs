@@ -10,6 +10,8 @@ module Numeric.Limp.Rep where
 import Data.Map (Map)
 import qualified Data.Map as M
 
+import Data.Monoid
+
 -- | The Representation class. Requires its members @Z c@ and @R c@ to be @Num@, @Ord@ and @Eq@.
 --
 -- For some reason, for type inference to work, the members must be @data@ instead of @type@.
@@ -35,6 +37,11 @@ data Assignment z r c
  = Assignment (Map z (Z c)) (Map r (R c))
 
 deriving instance (Show (Z c), Show (R c), Show z, Show r) => Show (Assignment z r c)
+
+instance (Ord z, Ord r) => Monoid (Assignment z r c) where
+ mempty = Assignment M.empty M.empty
+ mappend (Assignment z1 r1) (Assignment z2 r2)
+  = Assignment (M.union z1 z2) (M.union r1 r2)
 
 
 -- | Retrieve value of integer variable - or 0, if there is no value.

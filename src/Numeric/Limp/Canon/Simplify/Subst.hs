@@ -18,6 +18,9 @@ import qualified Data.Map as M
 -- > let (f', c') = substLinear a f
 -- > in  eval (a <> b) f == eval b f' + c'
 --
+-- > subst (x := 5) in 2x + y
+-- > (y, 10)
+--
 substLinear :: (Ord z, Ord r, Rep c) => Assignment z r c -> Linear z r c -> (Linear z r c, R c)
 substLinear (Assignment mz mr) (Linear mf)
  = ( Linear $ M.fromList $ concatMap update mf'
@@ -69,6 +72,9 @@ substConstraint1 ass (C1 low lin upp)
 -- > forall a b f.
 -- > let c' = substConstraint a c
 -- > in  check (a <> b) c == check b c'
+--
+-- > subst (x := 5) in 15 <= 2x + y <= 20
+-- > 5 <= y <= 10
 --
 substConstraint :: (Ord z, Ord r, Rep c) => Assignment z r c -> Constraint z r c -> Constraint z r c
 substConstraint ass (Constraint cs)
