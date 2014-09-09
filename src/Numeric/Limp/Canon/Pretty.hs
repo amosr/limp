@@ -8,6 +8,9 @@ import qualified Data.Map as M
 import qualified Data.Set as S
 import Data.Either
 
+instance (Show (Z c), Show (R c), Rep c, Show z, Show r, Ord z, Ord r) => Show (Program z r c) where
+ show = ppr show show
+
 ppr :: (Show (Z c), Show (R c), Rep c, Show z, Show r, Ord z, Ord r) => (z -> String) -> (r -> String) -> Program z r c -> String
 ppr pZ pR p
  = unlines

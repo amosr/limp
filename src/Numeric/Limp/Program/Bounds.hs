@@ -8,6 +8,8 @@ data Bounds z r c
  = BoundZ (B (Z c) z)
  | BoundR (B (R c) r)
 
+deriving instance (Show z, Show r, Show (Z c), Show (R c)) => (Show (Bounds z r c))
+
 -- | Maybe a lower bound, the variable's name, and maybe an upper bound.
 type B rep v
  = (Maybe rep, v, Maybe rep)

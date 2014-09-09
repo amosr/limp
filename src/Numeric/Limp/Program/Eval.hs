@@ -1,9 +1,13 @@
 -- | Functions for evaluating linear functions and checking constraints.
 module Numeric.Limp.Program.Eval where
 import Numeric.Limp.Rep
+import Numeric.Limp.Program.Bounds
 import Numeric.Limp.Program.Constraint
 import Numeric.Limp.Program.Linear
+import Numeric.Limp.Program.Program
 import Numeric.Limp.Program.ResultKind
+
+import qualified Data.Map as M
 
 -- | Evaluate a linear function with given assignment.
 -- If the linear function is purely integral, a @Z@ will be returned; otherwise, @R@.
@@ -51,3 +55,24 @@ check ass = go
 
   go CTrue
    = True
+
+-- | Check whether an assignment satisfies the program's constraints and bounds
+checkProgram :: (Rep c, Ord z, Ord r) => Assignment z r c -> Program z r c -> Bool
+checkProgram a p
+ =  check a (_constraints p)
+ && checkBounds a (_bounds p)
+
+checkBounds :: (Rep c, Ord z, Ord r) => Assignment z r c -> [Bounds z r c] -> Bool
+checkBounds ass bs
+ = all checkB bs
+ where
+  checkB (BoundZ (lo,z',up))
+   = checkBo (zOf ass z') lo up
+  checkB (BoundR (lo,r',up))
+   = checkBo (rOf ass r') lo up
+
+  checkBo v lo up
+   =  maybe True (<=v) lo
+   && maybe True (v<=) up
+     
+

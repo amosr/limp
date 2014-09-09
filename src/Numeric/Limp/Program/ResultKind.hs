@@ -21,6 +21,8 @@ data Linear z r c k where
  LZ :: [(z, Z c)]          -> (Z c) -> Linear z r c KZ
  LR :: [(Either z r, R c)] -> (R c) -> Linear z r c KR
 
+deriving instance (Show z, Show r, Show (Z c), Show (R c)) => (Show (Linear z r c k))
+
 
 -- | Find the result type of merging, or adding, two linear functions:
 -- adding two integers produces an integer, while adding a real on either side produces a real.

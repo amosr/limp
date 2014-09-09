@@ -1,6 +1,7 @@
 module Numeric.Limp.Program.Constraint where
 import Numeric.Limp.Program.Linear
 import Numeric.Limp.Program.ResultKind
+import Numeric.Limp.Rep
 
 import Data.Monoid
 
@@ -39,6 +40,8 @@ data Constraint z r c where
  (:&&)   :: Constraint z r c -> Constraint z r c -> Constraint z r c
  (:!)    :: String           -> Constraint z r c -> Constraint z r c
  CTrue   ::                                         Constraint z r c
+
+deriving instance (Show z, Show r, Show (Z c), Show (R c)) => (Show (Constraint z r c))
 
 infix  5 :==
 infix  5 :<=

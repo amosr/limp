@@ -23,6 +23,7 @@ bounderConstraint1 :: (Ord z, Ord r, Rep c) => Constraint1 z r c -> Maybe (Bound
 bounderConstraint1 (C1 low (Linear mf) upp)
  | M.size mf == 1
  , [(k,c)]   <- M.toList mf
+ , c /= 0
  = let fixup = (/ c)
        low'  = fmap fixup low
        upp'  = fmap fixup upp

@@ -46,3 +46,20 @@ mergeBounds (l1,u1) (l2,u2)
     (Just a', Just b')
      -> Just $ f a' b'
 
+
+-- | Check whether an assignment satisfies the program's constraints and bounds
+checkProgram :: (Rep c, Ord z, Ord r) => Assignment z r c -> Program z r c -> Bool
+checkProgram a p
+ =  check a (_constraints p)
+ && checkBounds a (_bounds p)
+
+checkBounds :: (Rep c, Ord z, Ord r) => Assignment z r c -> Map (Either z r) (Maybe (R c), Maybe (R c)) -> Bool
+checkBounds ass bs
+ =  M.fold (&&) True (M.mapWithKey checkB bs)
+ where
+  checkB k (lo,up)
+   = let v = zrOf ass k
+     in maybe True (<=v) lo
+     && maybe True (v<=) up
+     
+

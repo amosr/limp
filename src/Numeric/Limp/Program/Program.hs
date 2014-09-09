@@ -11,6 +11,7 @@ import Numeric.Limp.Rep
 data Direction
  = Minimise
  | Maximise
+   deriving Show
 
 -- | Whole program, parameterised by:
 --
@@ -30,6 +31,8 @@ data Program z r c
    -- Not all variables need to be mentioned, and if variables are mentioned multiple times, the intersection is used.
    , _bounds        :: [Bounds z r c]
    }
+
+deriving instance (Show z, Show r, Show (Z c), Show (R c)) => (Show (Program z r c))
 
 program :: Rep c => Direction -> Linear z r c k -> Constraint z r c -> [Bounds z r c] -> Program z r c
 program dir obj constr bounds
