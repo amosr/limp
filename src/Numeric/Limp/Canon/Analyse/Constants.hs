@@ -26,6 +26,10 @@ constantsProgram p
       (M.fromList $ concatMap tkRight ms)
 
   tkLeft (Left z, v)
+   -- Wow! What if the bounds aren't integral?
+   -- Well, I guess the ILP solver will eventually figure out it's infeasible.
+   -- Maybe it would be nice to trigger that error here.
+   | v == (fromZ $ truncate v)
    = [(z, truncate v)]
   tkLeft _
    = []
