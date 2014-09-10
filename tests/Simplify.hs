@@ -66,7 +66,7 @@ prop_simplify p
          , "CP':" ++ show cp'
          , "Ass:" ++ show a'
          , "Val: " ++ show (valcp, valcp')])
-       $ if valcp then valcp' else True
+       $ valcp == valcp'
 
 
 prop_subst_linear :: Vars -> Property
@@ -98,5 +98,4 @@ prop_subst_program vs
          , "Ass:" ++ show both
          , "Val: " ++ show (valcp, valcp')])
        $ if valcp then valcp' else True
-     
-     
+
