@@ -9,7 +9,9 @@ import Numeric.Limp.Canon.Simplify.Crunch as CS
 
 import Numeric.Limp.Canon.Pretty
 
-import Arbitrary.Program
+import Arbitrary.Assignment     as Arb
+import Arbitrary.Var            as Arb
+import Arbitrary.Program        as Arb
 import Data.Monoid
 
 import Test.Tasty.QuickCheck
@@ -64,5 +66,37 @@ prop_simplify p
          , "CP':" ++ show cp'
          , "Ass:" ++ show a'
          , "Val: " ++ show (valcp, valcp')])
-       $ valcp == valcp'
+       $ if valcp then valcp' else True
 
+
+prop_subst_linear :: Vars -> Property
+prop_subst_linear vs
+ = forAll (Arb.linearR    vs) $ \f ->
+   forAll (Arb.assignment vs) $ \a ->
+   forAll (Arb.assignment vs) $ \b ->
+     let (fc, _)   = C.linear f
+         (fc', c') = substLinear a fc
+     in  C.evalR (a <> b) fc == C.evalR b fc' + c'
+
+
+-- subst can actually make a failing program pass.
+-- so this test needs to be implication, not equivalence.
+prop_subst_program :: Vars -> Property
+prop_subst_program vs
+ = forAll (Arb.program    vs) $ \f ->
+   forAll (Arb.assignment vs) $ \a ->
+   forAll (Arb.assignment vs) $ \b ->
+     let fc    = C.program f
+         fc'   = substProgram a fc
+         both  = a <> b
+         valcp = C.checkProgram both fc 
+         valcp'= C.checkProgram b fc'
+     in counterexample 
+         (unlines
+         [ "CP: " ++ show fc
+         , "CP':" ++ show fc'
+         , "Ass:" ++ show both
+         , "Val: " ++ show (valcp, valcp')])
+       $ if valcp then valcp' else True
+     
+     
