@@ -7,8 +7,6 @@ import Numeric.Limp.Program.Linear
 import Numeric.Limp.Program.Program
 import Numeric.Limp.Program.ResultKind
 
-import qualified Data.Map as M
-
 -- | Evaluate a linear function with given assignment.
 -- If the linear function is purely integral, a @Z@ will be returned; otherwise, @R@.
 eval :: (Rep c, Ord z, Ord r) => Assignment z r c -> Linear z r c k -> KRep k c
