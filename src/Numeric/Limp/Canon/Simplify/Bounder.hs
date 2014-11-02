@@ -4,7 +4,9 @@ import Numeric.Limp.Canon.Constraint
 import Numeric.Limp.Canon.Linear
 import Numeric.Limp.Canon.Program
 import Numeric.Limp.Rep
+import Numeric.Limp.Error
 
+import Control.Applicative
 import Data.Either
 import qualified Data.Map as M
 
@@ -19,7 +21,10 @@ type Bound z r c = (Either z r, (Maybe (R c), Maybe (R c)))
 -- > bounder $ Constraint (5 <= 2y <= 10)
 -- > == Bound (Just 2.5) y (Just 5)
 --
-bounderConstraint1 :: (Ord z, Ord r, Rep c) => Constraint1 z r c -> Maybe (Bound z r c)
+-- > bounder $ Constraint (10 <= 2y <= 5)
+-- > == Left InfeasibleBoundEmpty
+--
+bounderConstraint1 :: (Ord z, Ord r, Rep c) => Constraint1 z r c -> Either Infeasible (Maybe (Bound z r c))
 bounderConstraint1 (C1 low (Linear mf) upp)
  | M.size mf == 1
  , [(k,c)]   <- M.toList mf
@@ -32,31 +37,40 @@ bounderConstraint1 (C1 low (Linear mf) upp)
         = (low',upp')
         | otherwise
         = (upp',low')
-   in  Just (k, bounds)
+
+       valid
+        | (Just lo, Just hi) <- bounds
+        = lo <= hi
+        | otherwise
+        = True
+
+   in  if  valid
+       then Right $ Just (k, bounds)
+       else Left InfeasibleNotIntegral
 
  | otherwise
- = Nothing
+ = Right Nothing
    
 
-bounderConstraint :: (Ord z, Ord r, Rep c) => Constraint z r c -> (Constraint z r c, [Bound z r c])
+bounderConstraint :: (Ord z, Ord r, Rep c) => Constraint z r c -> Either Infeasible (Constraint z r c, [Bound z r c])
 bounderConstraint (Constraint cs)
- = let (cs', bs) = partitionEithers $ map bounderC cs
-   in  (Constraint cs', bs)
+ = do   (cs', bs) <- partitionEithers <$> mapM bounderC cs
+        return      (Constraint cs', bs)
  where
   bounderC c
-   = case bounderConstraint1 c of
-     Nothing -> Left c
-     Just b  -> Right b
+   = do c' <- bounderConstraint1 c
+        return $ case c' of
+            Nothing -> Left c
+            Just b  -> Right b
    
 
 -- 
-bounderProgram :: (Ord z, Ord r, Rep c) => Program z r c -> Program z r c
+bounderProgram :: (Ord z, Ord r, Rep c) => Program z r c -> Either Infeasible (Program z r c)
 bounderProgram p
- = let (c',bs) = bounderConstraint $ _constraints p
-   in p
-    { _constraints = c'
-    , _bounds      = foldl merge (_bounds p) bs }
-
+ = do   (c',bs) <- bounderConstraint $ _constraints p
+        return $ p
+            { _constraints = c'
+            , _bounds      = foldl merge (_bounds p) bs }
  where
   merge m (k,v)
    = case M.lookup k m of

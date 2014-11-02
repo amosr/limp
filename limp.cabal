@@ -1,5 +1,5 @@
 name:                limp
-version:             0.3.1.0
+version:             0.3.2.0
 synopsis:            representation of Integer Linear Programs
 description:         so far, this package just provides two representations for linear programs: "Numeric.Limp.Program", which is what I expect end-users to use, and
                      "Numeric.Limp.Canon", which is simpler, but would be less nice for writing linear programs.
@@ -23,6 +23,7 @@ library
   hs-source-dirs: src
   exposed-modules:
         Numeric.Limp.Rep
+        Numeric.Limp.Error
 
         Numeric.Limp.Program.Bounds
         Numeric.Limp.Program.Constraint

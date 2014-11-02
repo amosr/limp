@@ -26,7 +26,12 @@ prop_bounder (ProgramAss p a)
  = let cp     = C.program p
        cp'    = CS.bounderProgram cp
        valcp  = C.checkProgram a cp
-       valcp' = C.checkProgram a cp'
+       valcp'
+        | Right p' <- cp'
+        = C.checkProgram a p'
+        -- Infeasible, so assignment is false
+        | otherwise
+        = False
    in  counterexample
        (unlines
          [ "CP: " ++ show cp
@@ -57,16 +62,20 @@ prop_crunch (ProgramAss p a)
 prop_simplify :: Program' -> Property
 prop_simplify p
  = let cp = C.program p
-       (a', cp') = CS.simplify cp
-       valcp  = C.checkProgram a' cp
-       valcp' = C.checkProgram a' cp'
-   in  counterexample
-       (unlines
-         [ "CP: " ++ show cp
-         , "CP':" ++ show cp'
-         , "Ass:" ++ show a'
-         , "Val: " ++ show (valcp, valcp')])
-       $ valcp == valcp'
+       simp = CS.simplify cp
+   in  case simp of
+       Left _
+        -> property True
+       Right (a', cp')
+        -> let valcp  = C.checkProgram a' cp
+               valcp' = C.checkProgram a' cp'
+           in  counterexample
+           (unlines
+             [ "CP: " ++ show cp
+             , "CP':" ++ show cp'
+             , "Ass:" ++ show a'
+             , "Val: " ++ show (valcp, valcp')])
+           $ valcp == valcp'
 
 
 prop_subst_linear :: Vars -> Property
