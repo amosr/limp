@@ -45,6 +45,9 @@ library
         Numeric.Limp.Canon.Simplify.Subst
         Numeric.Limp.Canon.Simplify
 
+        Numeric.Limp.Solve.Simplex.Maps
+        Numeric.Limp.Solve.Branch.Simple
+
   -- other-modules:       
   build-depends:
         base        < 5,
