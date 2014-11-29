@@ -26,13 +26,7 @@ xkcd dir = P.program dir
              z hw hwp .+.
              z ms msp .+.
              z sp spp :== con 1505 )
-           [ lowerZ 0 mf
-           , lowerZ 0 ff
-           , lowerZ 0 ss
-           , lowerZ 0 hw
-           , lowerZ 0 ms
-           , lowerZ 0 sp
-           ]
+           []
   where
     (mf, mfp) = ("mixed-fruit",       215)
     (ff, ffp) = ("french-fries",      275)
@@ -53,5 +47,4 @@ test
             putStrLn (show (simpl prog'))
             putStrLn (show (bb prog'))
             putStrLn (show (solver prog'))
-
 
