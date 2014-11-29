@@ -3,13 +3,11 @@ module BranchExample where
 import Numeric.Limp.Rep     as R
 import Numeric.Limp.Program as P
 import Numeric.Limp.Canon   as C
-import Numeric.Limp.Solve.Simplex.Maps   as S
+import Numeric.Limp.Solve.Simplex.Maps   as SM
+import Numeric.Limp.Solve.Simplex.StandardForm   as ST
 import Numeric.Limp.Solve.Branch.Simple  as B
 
 import Control.Applicative
-import Control.Monad
-import Data.Function (on)
-import Data.List     (sortBy)
 
 
 xkcd :: Direction -> P.Program String String R.IntDouble
@@ -39,9 +37,9 @@ test :: IO ()
 test
  = let prog' = C.program $ xkcd Maximise
        
-       simpl p = S.simplex $ S.relax p
+       simpl p = SM.simplex $ ST.standard p
 
-       solver p = S.assignment <$> (S.simplex $ S.relax p)
+       solver p = SM.assignment <$> simpl p
        bb    = B.branch solver
    in  do   
             putStrLn (show (simpl prog'))

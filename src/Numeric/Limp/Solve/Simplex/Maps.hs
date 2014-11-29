@@ -119,14 +119,73 @@ simplex1 s
   minBy' f ls
    = Just $ minimumBy f ls
 
--- Simplex
-simplex :: (Ord z, Ord r, Rep c)
+-- Single phase of simplex
+single_simplex :: (Ord z, Ord r, Rep c)
         => Standard z r c -> Maybe (Standard z r c)
-simplex s
+single_simplex s
  = case simplex1 s of
     Done        -> Just     s
-    Progress s' -> simplex  s'
+    Progress s' -> single_simplex  s'
     Stuck       -> Nothing
+
+
+-- Two phase
+simplex
+        :: (Ord z, Ord r, Rep c)
+        => Standard z r c -> Maybe (Standard z r c)
+simplex s
+ = do   p1 <- single_simplex $ pricing_out $ minimise_basics s
+        single_simplex $ drop_fake_objective p1
+
+-- | Minimise whatever variables are 'basic' in given standard
+-- input must not already have an objective row "SVO",
+-- because the existing objective is added as a new row with that name
+minimise_basics
+        :: (Ord z, Ord r, Rep c)
+        => Standard z r c -> Standard z r c
+minimise_basics s
+ = s
+ { _objective   = (M.map (const (1)) $ _constraints s, 0)
+ , _constraints = M.insert SVO (_objective s) (_constraints s)
+ }
+
+-- | Find the basic variables and "price them out" of the objective function,
+-- by subtracting multiples of the basic row from objective
+pricing_out 
+        :: (Ord z, Ord r, Rep c)
+        => Standard z r c -> Standard z r c
+pricing_out s
+ = s
+ { _objective = M.foldWithKey  go
+                    (_objective   s)
+                    (_constraints s)
+ }
+ where
+  go v row@(rm,ro) obj@(om,oo)
+   | coeff <- lookupRow obj v
+   , coeff /= 0
+   , rowv  <- lookupRow row v
+   , mul   <- -(coeff / rowv)
+   = -- rowv = 1
+     -- obj' = obj - (coeff/rowv)*row
+     ( M.unionWith (+) om (M.map (mul*) rm)
+     , oo + mul*ro )
+   | otherwise
+   = obj
+
+drop_fake_objective
+        :: (Ord z, Ord r, Rep c)
+        => Standard z r c -> Standard z r c
+drop_fake_objective s
+ | cs     <- _constraints s
+ , Just o <- M.lookup SVO cs
+ = s
+ { _objective   = o
+ , _constraints = M.delete SVO cs }
+
+ | otherwise
+ = s
+
 
 
 assignmentAll :: (Rep c)

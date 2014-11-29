@@ -104,6 +104,47 @@ prog8
     [] -- [lowerR 0 X1, lowerR 0 X2]
 
 
+-- An equality constraint
+-- x1 = 10
+prog9 :: P.Program () Xs R.IntDouble
+prog9
+ = P.maximise
+    -- objective
+        (r X1 1)
+    -- subject to
+     (   r X1  1 :== con 10 )
+    [lowerR 0 X1]
+
+-- x1 = 10
+prog10 :: P.Program () Xs R.IntDouble
+prog10
+ = P.minimise
+    -- objective
+        (r X1 1)
+    -- subject to
+     (   r X1  1 :== con 10 )
+    [lowerR 0 X1]
+
+
+-- From wikipedia ----------------
+-- x1 = 10
+prog11 :: P.Program () Xs R.IntDouble
+prog11
+ = P.minimise
+    -- objective
+        (r X1 (-2) .+. r X2 (-3) .+. r X3 (-4))
+    -- subject to
+     (   r X1  3   .+. r X2 2    .+. r X3 1 :== con 10
+     :&& r X1  2   .+. r X2 5    .+. r X3 3 :== con 15)
+    [lowerR 0 X1
+    ,lowerR 0 X2
+    ,lowerR 0 X3]
+
+
+
+
+std :: (Ord z, Ord r, Rep c) => P.Program z r c -> Standard z r c
+std = ST.standard . C.program
 
 
 
@@ -120,6 +161,10 @@ test p
    Just s
     -> do   let (Assignment _ vars,obj) = SM.assignment s
             let vars'      = M.toList vars
+
+            putStrLn (show $ ST.standard $ C.program p)
+            putStrLn (show $ SM.simplex1 $ ST.standard $ C.program p)
+
             putStrLn "Vars:"
             putStrLn (show vars')
             putStrLn "Obj:"

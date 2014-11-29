@@ -34,6 +34,8 @@ data StandardVar z r
 
     -- | A slack variable, introduced to make less-eq constraints into equalities
     | SVS Int
+    -- | Magic objective
+    | SVO 
 
     -- | When a variable has a lower bound other than 0, we replace all occurences with
     -- with a new version minus the lower bound.
@@ -153,8 +155,8 @@ standard p
 
 
   lt lo lin s
-   = ( M.union lin (M.fromList [(s,-1)])
-     , lo )
+   = ( M.union (M.map negate lin) (M.fromList [(s,1)])
+     , negate lo )
   gt up lin s
    = ( M.union lin (M.fromList [(s, 1)])
      , up )
