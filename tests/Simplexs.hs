@@ -1,6 +1,7 @@
 module Simplexs where
 
-import Numeric.Limp.Rep     as R
+import Numeric.Limp.Rep.Rep     as R
+import Numeric.Limp.Rep.Arbitrary     as R
 import Numeric.Limp.Program as P
 import Numeric.Limp.Canon   as C
 import Numeric.Limp.Solve.Simplex.Maps      as SM
@@ -14,7 +15,7 @@ data Xs = X1 | X2 | X3
 
 -- Dead simple ones -------------------------
 -- x1 = 10
-prog1 :: P.Program () Xs R.IntDouble
+prog1 :: P.Program () Xs R.Arbitrary
 prog1
  = P.maximise
     -- objective
@@ -25,7 +26,7 @@ prog1
     []
 
 -- x1 = 10
-prog2 :: P.Program () Xs R.IntDouble
+prog2 :: P.Program () Xs R.Arbitrary
 prog2
  = P.maximise
     -- objective
@@ -35,7 +36,7 @@ prog2
     [ lowerR 0 X1 ]
 
 -- x1 = 0
-prog3 :: P.Program () Xs R.IntDouble
+prog3 :: P.Program () Xs R.Arbitrary
 prog3
  = P.minimise
     -- objective
@@ -45,7 +46,7 @@ prog3
     [ lowerR 0 X1 ]
 
 -- Unbounded!
-prog4 :: P.Program () Xs R.IntDouble
+prog4 :: P.Program () Xs R.Arbitrary
 prog4
  = P.minimise
     -- objective
@@ -58,7 +59,7 @@ prog4
 -- Two constraints! --------------
 
 -- x = 10
-prog5 :: P.Program () Xs R.IntDouble
+prog5 :: P.Program () Xs R.Arbitrary
 prog5
  = P.maximise
     -- objective
@@ -69,7 +70,7 @@ prog5
     []
 
 -- x = -10
-prog6 :: P.Program () Xs R.IntDouble
+prog6 :: P.Program () Xs R.Arbitrary
 prog6
  = P.minimise
     -- objective
@@ -82,7 +83,7 @@ prog6
 
 -- Now two variables -------------
 -- x1 = 20, x2 = 10
-prog7 :: P.Program () Xs R.IntDouble
+prog7 :: P.Program () Xs R.Arbitrary
 prog7
  = P.maximise
     -- objective
@@ -93,7 +94,7 @@ prog7
     [lowerR 0 X1, lowerR 0 X2]
 
 -- x1 = 20, x2 = 10
-prog8 :: P.Program () Xs R.IntDouble
+prog8 :: P.Program () Xs R.Arbitrary
 prog8
  = P.maximise
     -- objective
@@ -105,7 +106,7 @@ prog8
 
 -- Something where vars=0 isn't sat ------
 -- x1 = 8
-prog9 :: P.Program () Xs R.IntDouble
+prog9 :: P.Program () Xs R.Arbitrary
 prog9
  = P.minimise
     -- objective
@@ -116,7 +117,7 @@ prog9
     [lowerR 0 X1]
 
 -- x1 = 10
-prog10 :: P.Program () Xs R.IntDouble
+prog10 :: P.Program () Xs R.Arbitrary
 prog10
  = P.maximise
     -- objective
@@ -130,7 +131,7 @@ prog10
 
 -- An equality constraint ------------
 -- x1 = 10
-prog11 :: P.Program () Xs R.IntDouble
+prog11 :: P.Program () Xs R.Arbitrary
 prog11
  = P.maximise
     -- objective
@@ -140,7 +141,7 @@ prog11
     [lowerR 0 X1]
 
 -- x1 = 10
-prog12 :: P.Program () Xs R.IntDouble
+prog12 :: P.Program () Xs R.Arbitrary
 prog12
  = P.minimise
     -- objective
@@ -152,7 +153,7 @@ prog12
 
 -- From wikipedia ----------------
 -- x1 = 2.142..., x3 = 3.571...
-prog13 :: P.Program () Xs R.IntDouble
+prog13 :: P.Program () Xs R.Arbitrary
 prog13
  = P.minimise
     -- objective
@@ -165,7 +166,7 @@ prog13
     ,lowerR 0 X3]
 
 -- x1 = 1.818..., x2 = 2.272...
-prog14 :: P.Program () Xs R.IntDouble
+prog14 :: P.Program () Xs R.Arbitrary
 prog14
  = P.maximise
     -- objective
@@ -179,7 +180,7 @@ prog14
 
 -- An equality constraint on unconstrained (+-) ------------
 -- x1 = 10
-prog15 :: P.Program () Xs R.IntDouble
+prog15 :: P.Program () Xs R.Arbitrary
 prog15
  = P.maximise
     -- objective
@@ -190,7 +191,7 @@ prog15
 
 -- A lower bound greater than zero ------------
 -- x1 = 5
-prog16 :: P.Program () Xs R.IntDouble
+prog16 :: P.Program () Xs R.Arbitrary
 prog16
  = P.minimise
     -- objective
@@ -201,7 +202,7 @@ prog16
 
 -- Lower and upper bounds -------
 -- x1 = 5
-prog17 :: P.Program () Xs R.IntDouble
+prog17 :: P.Program () Xs R.Arbitrary
 prog17
  = P.minimise
     -- objective
@@ -210,7 +211,7 @@ prog17
      (   r X1  1 :<= con 30 )
     [lowerUpperR 5 X1 10]
 -- x1 = 10
-prog18 :: P.Program () Xs R.IntDouble
+prog18 :: P.Program () Xs R.Arbitrary
 prog18
  = P.maximise
     -- objective
@@ -220,7 +221,7 @@ prog18
     [lowerUpperR 5 X1 10]
 
 -- x1 = 1, x2 = 2
-prog19 :: P.Program () Xs R.IntDouble
+prog19 :: P.Program () Xs R.Arbitrary
 prog19
  = P.minimise
     (r X1 1 .+. r X2 1)
@@ -233,7 +234,7 @@ prog19
 -- error uncovered by branch -------
 -- x1 = 1
 -- x2 = 1.870...
-prog20 :: P.Program () Xs R.IntDouble
+prog20 :: P.Program () Xs R.Arbitrary
 prog20
  = P.minimise
     -- x1 = mozzarella
@@ -261,7 +262,7 @@ Bounds
 
 -- nonzero lower bound with non-1 coeff
 -- x1 = 2.5
-prog21 :: P.Program () Xs R.IntDouble
+prog21 :: P.Program () Xs R.Arbitrary
 prog21
  = P.minimise
     (r1 X1)
@@ -270,7 +271,7 @@ prog21
 
 -- eq bound with non-1 coeff
 -- x1 = 1, x2 = 3
-prog22 :: P.Program () Xs R.IntDouble
+prog22 :: P.Program () Xs R.Arbitrary
 prog22
  = P.minimise
     (r1 X1 .+. r1 X2)
@@ -285,7 +286,7 @@ std = ST.standard . C.program
 
 
 
-test :: P.Program () Xs IntDouble -> IO Bool
+test :: P.Program () Xs R.Arbitrary -> IO Bool
 test p
  = case SM.simplex $ ST.standard $ C.program p of
    Nothing
