@@ -96,7 +96,7 @@ substLinear sub (lin, co)
    = case var of
       SV s
        | Just (vs,cnst) <- M.lookup s sub
-       -> (M.map (*coeff) vs, -cnst)
+       -> (M.map (*coeff) vs, -cnst * coeff)
       _
        -> (M.fromList [(var, coeff)], 0)
 

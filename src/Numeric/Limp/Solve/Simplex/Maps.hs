@@ -203,9 +203,10 @@ find_initial_sat s
    | otherwise
    = go rs
 
+  -- opposite of pivotRowForCol...
   pivotRowForNegatives col
    = fmap   fst
-   $ minBy' (compare `on` snd)
+   $ minBy' (compare `on` (negate . snd))
    $ concatMap (\(n,r)
              -> let rv = lookupRow r col
                     o  = objOfRow  r

@@ -219,7 +219,7 @@ prog18
      (   r X1  1 :<= con 30 )
     [lowerUpperR 5 X1 10]
 
-
+-- x1 = 1, x2 = 2
 prog19 :: P.Program () Xs R.IntDouble
 prog19
  = P.minimise
@@ -229,6 +229,54 @@ prog19
     [ lowerR 0 X1
     , lowerR 0 X2]
 
+
+-- error uncovered by branch -------
+-- x1 = 1
+-- x2 = 1.870...
+prog20 :: P.Program () Xs R.IntDouble
+prog20
+ = P.minimise
+    -- x1 = mozzarella
+    -- x2 = sampler plate
+    (r1 X1 .+. r1 X2)
+    (r X1 420 .+. r X2 580 :== con 1505)
+    [ lowerR 1 X1
+    , lowerUpperR 0 X2 2 ]
+
+{-
+Minimize
+	1.0 "french-fries" + 1.0 "hot-wings" + 1.0 "mixed-fruit" + 1.0 "mozzarella-sticks" + 1.0 "sampler-plate" + 1.0 "side-salad"
+Subject to
+	-275.0 "french-fries" - 355.0 "hot-wings" - 215.0 "mixed-fruit" - 420.0 "mozzarella-sticks" - 580.0 "sampler-plate" - 335.0 "side-salad" >= -1505.0
+	-275.0 "french-fries" - 355.0 "hot-wings" - 215.0 "mixed-fruit" - 420.0 "mozzarella-sticks" - 580.0 "sampler-plate" - 335.0 "side-salad" <= -1505.0
+
+Bounds
+	0.0 <= "french-fries"
+	0.0 <= "hot-wings"
+	0.0 <= "mixed-fruit"
+	1.0 <= "mozzarella-sticks"
+	0.0 <= "sampler-plate" <= 2.0
+	0.0 <= "side-salad"
+-}
+
+-- nonzero lower bound with non-1 coeff
+-- x1 = 2.5
+prog21 :: P.Program () Xs R.IntDouble
+prog21
+ = P.minimise
+    (r1 X1)
+    (r X1 2 :>= con 5)
+    [ lowerR 1 X1 ]
+
+-- eq bound with non-1 coeff
+-- x1 = 1, x2 = 3
+prog22 :: P.Program () Xs R.IntDouble
+prog22
+ = P.minimise
+    (r1 X1 .+. r1 X2)
+    (r X1 2 .+. r X2 1 :>= con 5)
+    [ lowerUpperR 1 X1 1
+    , lowerR 0 X2]
 
 
 std :: (Ord z, Ord r, Rep c) => P.Program z r c -> Standard z r c

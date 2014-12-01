@@ -7,6 +7,8 @@ import Numeric.Limp.Solve.Simplex.Maps   as SM
 import Numeric.Limp.Solve.Simplex.StandardForm   as ST
 import Numeric.Limp.Solve.Branch.Simple  as B
 
+-- import Numeric.Limp.Canon.Pretty
+
 import Control.Applicative
 
 -- Dead simple ones -------------------------
@@ -72,10 +74,16 @@ test prog
        
        simpl p = SM.simplex $ ST.standard p
 
-       solver p = SM.assignment <$> simpl p
+       solver p
+        | st <- ST.standard p
+        , Just s' <- SM.simplex st
+        , ass <- SM.assignment s'
+         = Just ass
+        | otherwise
+        = Nothing
        bb    = B.branch solver
    in  do   
             -- putStrLn (show (simpl prog'))
-            putStrLn (show (solver prog'))
+            -- putStrLn (show (solver prog'))
             putStrLn (show (bb prog'))
 
