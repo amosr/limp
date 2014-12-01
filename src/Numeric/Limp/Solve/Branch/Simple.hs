@@ -2,7 +2,7 @@
 --
 --
 module Numeric.Limp.Solve.Branch.Simple
-    (branch)
+    (branch, makeIntegral)
     where
 import Numeric.Limp.Canon.Program
 import Numeric.Limp.Rep

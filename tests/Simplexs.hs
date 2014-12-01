@@ -21,7 +21,7 @@ prog1
         (r X1 1)
     -- subject to
      (   r X1  1 :<= con 10)
-    -- bounds ommitted for now
+    -- bounds omitted for now
     []
 
 -- x1 = 10
@@ -103,11 +103,35 @@ prog8
      :&& r X2  1 :<= con 10)
     [] -- [lowerR 0 X1, lowerR 0 X2]
 
-
--- An equality constraint
--- x1 = 10
+-- Something where vars=0 isn't sat ------
+-- x1 = 8
 prog9 :: P.Program () Xs R.IntDouble
 prog9
+ = P.minimise
+    -- objective
+        (r X1 1)
+    -- subject to
+     (   r X1  1 :>= con 8 
+     :&& r X1  1 :<= con 10)
+    [lowerR 0 X1]
+
+-- x1 = 10
+prog10 :: P.Program () Xs R.IntDouble
+prog10
+ = P.maximise
+    -- objective
+        (r X1 1)
+    -- subject to
+     (   r X1  1 :>= con 8 
+     :&& r X1  1 :<= con 10)
+    [lowerR 0 X1]
+
+
+
+-- An equality constraint ------------
+-- x1 = 10
+prog11 :: P.Program () Xs R.IntDouble
+prog11
  = P.maximise
     -- objective
         (r X1 1)
@@ -116,8 +140,8 @@ prog9
     [lowerR 0 X1]
 
 -- x1 = 10
-prog10 :: P.Program () Xs R.IntDouble
-prog10
+prog12 :: P.Program () Xs R.IntDouble
+prog12
  = P.minimise
     -- objective
         (r X1 1)
@@ -127,9 +151,9 @@ prog10
 
 
 -- From wikipedia ----------------
--- x1 = 10
-prog11 :: P.Program () Xs R.IntDouble
-prog11
+-- x1 = 2.142..., x3 = 3.571...
+prog13 :: P.Program () Xs R.IntDouble
+prog13
  = P.minimise
     -- objective
         (r X1 (-2) .+. r X2 (-3) .+. r X3 (-4))
@@ -139,6 +163,61 @@ prog11
     [lowerR 0 X1
     ,lowerR 0 X2
     ,lowerR 0 X3]
+
+-- x1 = 1.818..., x2 = 2.272...
+prog14 :: P.Program () Xs R.IntDouble
+prog14
+ = P.maximise
+    -- objective
+        (r X1 (-2) .+. r X2 (-3) .+. r X3 (-4))
+    -- subject to
+     (   r X1  3   .+. r X2 2    .+. r X3 1 :== con 10
+     :&& r X1  2   .+. r X2 5    .+. r X3 3 :== con 15)
+    [lowerR 0 X1
+    ,lowerR 0 X2
+    ,lowerR 0 X3]
+
+-- An equality constraint on unconstrained (+-) ------------
+-- x1 = 10
+prog15 :: P.Program () Xs R.IntDouble
+prog15
+ = P.maximise
+    -- objective
+        (r X1 1)
+    -- subject to
+     (   r X1  1 :== con 10 )
+    []
+
+-- A lower bound greater than zero ------------
+-- x1 = 5
+prog16 :: P.Program () Xs R.IntDouble
+prog16
+ = P.minimise
+    -- objective
+        (r X1 1)
+    -- subject to
+     (   r X1  1 :<= con 30 )
+    [lowerR 5 X1]
+
+-- Lower and upper bounds -------
+-- x1 = 5
+prog17 :: P.Program () Xs R.IntDouble
+prog17
+ = P.minimise
+    -- objective
+        (r X1 1)
+    -- subject to
+     (   r X1  1 :<= con 30 )
+    [lowerUpperR 5 X1 10]
+-- x1 = 5
+prog18 :: P.Program () Xs R.IntDouble
+prog18
+ = P.maximise
+    -- objective
+        (r X1 1)
+    -- subject to
+     (   r X1  1 :<= con 30 )
+    [lowerUpperR 5 X1 10]
 
 
 

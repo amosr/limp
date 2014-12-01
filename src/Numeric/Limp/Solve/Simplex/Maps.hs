@@ -75,49 +75,65 @@ simplex1 s
   go []
    = Stuck
   go ((pc,_):pcs)
-   = case pivotRow pc of
+   = case pivotRowForCol s pc of
        Nothing -> go pcs
-       Just ((pr,r),_)
-        -> let norm = normaliseRow pc r
-               rest = filter ((/=pr) . fst) $ M.toList $ _constraints s
-           in Progress
-            $ Standard
-            { _constraints = M.fromList ((pc, norm) : map (id *** fixup pc norm) rest)
-            , _objective   = fixup pc norm $ _objective s
-            , _substs      = _substs s }
-
+       Just pr
+        -> Progress
+         $ pivot s (pr,pc)
 
   pivotCols
    = let ls  = M.toList $ fst $ _objective s
-         kvs = sortBy (compare `on` snd) ls
-     in  filter ((<0) . snd) kvs
+         kvs = sortBy (compare `on` (negate . snd)) ls
+     in  filter ((>0) . snd) kvs
 
-  pivotRow col
-   = minBy' (compare `on` snd)
-   $ filter ((>0) . snd)
-   $ map (\(n,r)
-             -> let rv = lookupRow r col
-                    o  = objOfRow  r
-                in if    rv == 0
-                   then ((n,r), 0)
-                   else ((n,r), o / rv))
-   $ M.toList
-   $ _constraints s
+pivotRowForCol :: (Ord z, Ord r, Rep c)
+        => Standard z r c
+        -> StandardVar z r
+        -> Maybe (StandardVar z r)
+pivotRowForCol s col
+ = fmap   fst
+ $ minBy' (compare `on` snd)
+ $ concatMap (\(n,r)
+           -> let rv = lookupRow r col
+                  o  = objOfRow  r
+              in if    rv > 0
+                 then [(n, o / rv)]
+                 else [])
+ $ M.toList
+ $ _constraints s
 
-  normaliseRow pc row@(rm, ro)
+minBy' :: (a -> a -> Ordering) -> [a] -> Maybe a
+minBy' _ []
+ = Nothing
+minBy' f ls
+ = Just $ minimumBy f ls
+
+
+pivot   :: (Ord z, Ord r, Rep c)
+        => Standard z r c
+        -> (StandardVar z r, StandardVar z r)
+        -> Standard z r c
+pivot s (pr,pc)
+ = let norm = normaliseRow
+       rest = filter ((/=pr) . fst) $ M.toList $ _constraints s
+   in Standard
+    { _constraints = M.fromList ((pc, norm) : map (id *** fixup norm) rest)
+    , _objective   = fixup norm $ _objective s
+    , _substs      = _substs s }
+ where
+  normaliseRow
+   | Just row@(rm, ro) <- M.lookup pr $ _constraints s
    = let c' = lookupRow row pc
      in  (M.map (/c') rm, ro / c')
+   | otherwise
+   = (M.empty, 0)
 
-  fixup pc _norm@(nm,no) row@(rm,ro)
+  fixup _norm@(nm,no) row@(rm,ro)
    = let co = lookupRow row pc
      in  {- row' = row - co*norm -}
          ( M.unionWith (+) rm (M.map ((-co)*) nm)
          , ro - co * no )
 
-  minBy' _ []
-   = Nothing
-  minBy' f ls
-   = Just $ minimumBy f ls
 
 -- Single phase of simplex
 single_simplex :: (Ord z, Ord r, Rep c)
@@ -134,8 +150,33 @@ simplex
         :: (Ord z, Ord r, Rep c)
         => Standard z r c -> Maybe (Standard z r c)
 simplex s
- = do   p1 <- single_simplex $ pricing_out $ minimise_basics s
-        single_simplex $ drop_fake_objective p1
+ = case negative_val_rows of
+    []      -> single_simplex s
+    rs      -> go rs
+ where
+  negative_val_rows
+   = filter ((<0) . objOfRow . snd)
+   $ M.toList
+   $ _constraints s
+
+  min_of_row (_,(rm,_))
+   = minBy' (compare `on` snd)
+   $ filter ((<0) . snd)
+   $ M.toList rm
+
+
+  go []
+   = Nothing
+
+  go (r:rs)
+   | Just (pc,_) <- min_of_row r
+   , Just  pr    <- pivotRowForCol s pc
+   = simplex
+   $ pivot s (pr, pc)
+
+   | otherwise
+   = go rs
+  
 
 -- | Minimise whatever variables are 'basic' in given standard
 -- input must not already have an objective row "SVO",

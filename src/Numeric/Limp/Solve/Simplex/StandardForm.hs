@@ -1,5 +1,19 @@
--- | Standard form for programs:
--- only equalities, all variables >= 0
+-- | Standard form for programs: only equalities and all variables >= 0
+-- To convert an arbitrary program to this form, we need to:
+--
+-- Convert unconstrained (-inf <= x <= +inf) variable into two separate parts, x+ and x-
+--  wherever x occurs, it will be replaced with "x+" - "x-".
+--
+-- Convert variables with non-zero lower bounds (c <= x) to a new variable x', so that
+--  x = x' + c
+--
+-- The opposite of these conversions must be performed when extracting a variable assignment
+-- from the solved program.
+--
+-- All constraints are converted into a less-than with a constant on the right, and then
+-- these less-than constraints (f <= c) have a slack variable s added such that
+--  f + s == c && s >= 0
+--
 module Numeric.Limp.Solve.Simplex.StandardForm
     where
 import Numeric.Limp.Rep
@@ -11,9 +25,11 @@ import qualified Data.Map as M
 import qualified Data.Set as S
 
 
+-- | A single linear function with a constant summand
 type StandardRow z r c
     = (StandardLinear z r c, R c)
 
+-- | Entire program in standard form, as well as substitutions required to extract an assignment
 data Standard z r c
     = Standard
     { _objective   :: StandardRow z r c
@@ -34,7 +50,8 @@ data StandardVar z r
 
     -- | A slack variable, introduced to make less-eq constraints into equalities
     | SVS Int
-    -- | Magic objective
+    -- | Magic objective, used when hiding an existing objective as a constraint
+    -- and creating a new objective
     | SVO 
 
     -- | When a variable has a lower bound other than 0, we replace all occurences with
@@ -54,6 +71,7 @@ data StandardVar z r
     deriving (Eq, Ord, Show)
 
 
+-- | Sum a list of linear functions together
 addLinears
     :: (Ord z, Ord r, Rep c)
     => [(StandardLinear z r c, R c)] -> (StandardLinear z r c, R c)
@@ -64,6 +82,7 @@ addLinears ((lin,co):rs)
    in  (M.unionWith (+) lin lin', co + co')
 
 
+-- | Perform substitution over a linear function/row
 substLinear
     :: (Ord z, Ord r, Rep c)
     => StandardSubst z r c -> (StandardLinear z r c, R c) -> (StandardLinear z r c, R c)
@@ -82,6 +101,7 @@ substLinear sub (lin, co)
        -> (M.fromList [(var, coeff)], 0)
 
 
+-- | Convert canon program into standard form
 standard :: (Ord z, Ord r, Rep c)
         => C.Program z r c
         -> Standard z r c
@@ -94,32 +114,43 @@ standard p
   fv = C.varsOfProgram p
   bs = C._bounds p
 
+  -- Objective is just negated
   objective
    = substLinear substs
-    (standardOfLinear $ C._objective p, 0)
+    ( M.map negate
+      $ standardOfLinear $ C._objective p
+    , 0)
 
+  -- Constraints are created for original program's bounds and constraints
+  -- and substitution is performed.
+  -- Each constraint/row receives its own slack variable.
   constraints
    = M.fromList
    $ zipWith (\c s -> (s, substLinear substs $ c s))
    ( constrs ++ bounds )
    ( map SVS [1..] )
 
+  -- Union of all substitutions
   substs
    = M.fromList
    $ concatMap substOf
    $ S.toList fv
 
+  -- Substitution for "x" ==> "x+" - "x-"
   negPos v
    = [(v, (M.fromList [(SVPos v, 1), (SVNeg v, -1)], 0))]
 
+  -- Look at bounds of variables and decide
   substOf v
    = case M.lookup v bs of
+     -- Unconstrained, so it can be negative
      Nothing
       -> negPos v
      Just (Nothing, Nothing)
       -> negPos v
      Just (Just 0, _)
       -> []
+     -- Nonzero lower bound, so replace: v = v' + n
      Just (Just n, _)
       -> [(v, (M.fromList [(SVLower v, 1)], n)) ]
      _

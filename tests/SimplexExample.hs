@@ -40,7 +40,7 @@ test
     -> do   let (Assignment _ vars,obj) = SM.assignment s
             let vars'      = M.toList vars
             let e_vars = [(Right X1, 2.0), (Right X3, 8.0)] :: [(Either () Xs, R IntDouble)]
-            let e_obj  = 280
+            let e_obj  = -280
             putStrLn "Vars:"
             putStrLn (show vars')
             putStrLn "Obj:"
