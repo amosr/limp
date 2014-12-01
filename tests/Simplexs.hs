@@ -209,7 +209,7 @@ prog17
     -- subject to
      (   r X1  1 :<= con 30 )
     [lowerUpperR 5 X1 10]
--- x1 = 5
+-- x1 = 10
 prog18 :: P.Program () Xs R.IntDouble
 prog18
  = P.maximise
@@ -219,6 +219,15 @@ prog18
      (   r X1  1 :<= con 30 )
     [lowerUpperR 5 X1 10]
 
+
+prog19 :: P.Program () Xs R.IntDouble
+prog19
+ = P.minimise
+    (r X1 1 .+. r X2 1)
+    (    r X1 2 :<= r X2 1
+    :&&  r X1 1 :>= con 1)
+    [ lowerR 0 X1
+    , lowerR 0 X2]
 
 
 

@@ -206,3 +206,22 @@ standard p
 -- assignmentOfMap :: Standard z r c -> M.Map (StandardVar z r) (R c) -> Assignment z r c
 
 
+
+-- Simple helpers ----------
+
+-- | Get the coefficient of a variable in given row
+lookupRow :: (Ord z, Ord r, Rep c)
+    => StandardRow z r c
+    -> StandardVar z r
+    -> R c
+lookupRow (r,_) v
+ = case M.lookup v r of
+    Nothing -> 0
+    Just vv -> vv
+
+-- | Get objective or basis value of a row
+objOfRow
+    :: StandardRow z r c
+    -> R c
+objOfRow = snd
+
