@@ -1,5 +1,5 @@
 name:                limp
-version:             0.3.2.0
+version:             0.3.2.1
 synopsis:            representation of Integer Linear Programs
 description:         so far, this package just provides two representations for linear programs: "Numeric.Limp.Program", which is what I expect end-users to use, and
                      "Numeric.Limp.Canon", which is simpler, but would be less nice for writing linear programs.
@@ -52,7 +52,6 @@ library
         Numeric.Limp.Solve.Simplex.Maps
         Numeric.Limp.Solve.Branch.Simple
 
-  -- other-modules:       
   build-depends:
         base        < 5,
         containers  == 0.5.*
@@ -66,6 +65,15 @@ test-suite test
   type: exitcode-stdio-1.0
   main-is: Main.hs
   hs-source-dirs: tests
+  other-modules:
+        Arbitrary.Assignment
+        Arbitrary.Program
+        Arbitrary.Var
+        BranchExample
+        Convert
+        SimplexExample
+        Simplexs
+        Simplify
   build-depends:
         base        < 5,
         containers  == 0.5.*,
