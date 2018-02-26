@@ -85,4 +85,3 @@ test-suite test
 
   default-language: Haskell2010
   default-extensions:       TemplateHaskell TypeFamilies FlexibleContexts GeneralizedNewtypeDeriving DataKinds GADTs RankNTypes StandaloneDeriving FlexibleInstances
-
