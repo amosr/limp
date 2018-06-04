@@ -53,7 +53,7 @@ library
         Numeric.Limp.Solve.Branch.Simple
 
   build-depends:
-        base        >= 4.9 && < 4.12,
+        base        >= 4.9 && < 5,
         containers  == 0.5.*
 
   ghc-options: -Wall -fno-warn-orphans
