@@ -249,7 +249,7 @@ assignment s
   rs'     = M.map eval $ _substs s
 
   eval (lin,co)
-          = M.fold (+) co
+          = M.foldr (+) co
           $ M.mapWithKey (\k r -> r * (maybe 0 id $ M.lookup k vs))
           $ lin
 
@@ -281,7 +281,7 @@ pricing_out
         => Standard z r c -> Standard z r c
 pricing_out s
  = s
- { _objective = M.foldWithKey  go
+ { _objective = M.foldrWithKey  go
                     (_objective   s)
                     (_constraints s)
  }

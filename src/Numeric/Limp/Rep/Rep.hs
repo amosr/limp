@@ -14,7 +14,6 @@ import qualified Data.Map as M
 #if MIN_VERSION_base(4,9,0) && !MIN_VERSION_base(4,11,0)
 import Data.Semigroup
 #endif
-import Data.Monoid
 
 -- | The Representation class. Requires its members @Z c@ and @R c@ to be @Num@, @Ord@ and @Eq@.
 --
@@ -42,10 +41,8 @@ data Assignment z r c
 
 deriving instance (Show (Z c), Show (R c), Show z, Show r) => Show (Assignment z r c)
 
-#if MIN_VERSION_base(4,9,0)
 instance (Ord z, Ord r) => Semigroup (Assignment z r c) where
  (<>) = mappend
-#endif
 
 instance (Ord z, Ord r) => Monoid (Assignment z r c) where
  mempty = Assignment M.empty M.empty

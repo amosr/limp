@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 -- | Perform some simple optimisations on program
 module Numeric.Limp.Canon.Simplify where
 import Numeric.Limp.Canon.Program
@@ -10,7 +11,9 @@ import Numeric.Limp.Canon.Simplify.Bounder
 import Numeric.Limp.Canon.Simplify.Crunch
 import Numeric.Limp.Canon.Simplify.Subst
 
-import Data.Monoid
+#if MIN_VERSION_base(4,9,0) && !MIN_VERSION_base(4,11,0)
+import Data.Semigroup
+#endif
 
 simplify :: (Ord z, Ord r, Rep c) => Program z r c -> Either Infeasible (Assignment z r c, Program z r c)
 simplify p

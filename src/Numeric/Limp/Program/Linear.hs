@@ -22,7 +22,7 @@ import Numeric.Limp.Rep
 import Numeric.Limp.Program.ResultKind
 
 -- | Any linear function can be converted into a real linear function.
-toR :: Rep c => Linear z r c k -> Linear z r c KR
+toR :: Rep c => Linear z r c k -> Linear z r c 'KR
 toR (LZ ls co) = LR (map go ls) (fromZ co)
  where
   go (z',c') = (Left z', fromZ c')
@@ -30,44 +30,44 @@ toR l@(LR{}) =        l
 
 
 -- | Integral variable
-z :: Rep c => z -> Z c -> Linear z r c KZ
+z :: Rep c => z -> Z c -> Linear z r c 'KZ
 z z' c
  = LZ [(z', c)] 0
 
 -- | Integral variable with coefficient 1
-z1 :: Rep c => z -> Linear z r c KZ
+z1 :: Rep c => z -> Linear z r c 'KZ
 z1 z'
  = z z' 1
 
 -- | Real variable
-r :: Rep c => r -> R c -> Linear z r c KR
+r :: Rep c => r -> R c -> Linear z r c 'KR
 r r' c
  = LR [(Right r', c)] 0
 
 -- | Real variable with coefficient 1
-r1 :: Rep c => r -> Linear z r c KR
+r1 :: Rep c => r -> Linear z r c 'KR
 r1 r'
  = r r' 1
 
 
 -- | An integral constant summand
-con :: Rep c => Z c -> Linear z r c KZ
+con :: Rep c => Z c -> Linear z r c 'KZ
 con c'
  = LZ [] c'
 
 -- | An integral constant summand
-conZ :: Rep c => Z c -> Linear z r c KZ
+conZ :: Rep c => Z c -> Linear z r c 'KZ
 conZ = con
 
 -- | Constant @0@
-c0 :: Rep c => Linear z r c KZ
+c0 :: Rep c => Linear z r c 'KZ
 c0 = con 0
 -- | Constant @1@
-c1 :: Rep c => Linear z r c KZ
+c1 :: Rep c => Linear z r c 'KZ
 c1 = con 1
 
 -- | A real constant
-conR :: Rep c => R c -> Linear z r c KR
+conR :: Rep c => R c -> Linear z r c 'KR
 conR c'
  = LR [] c'
 
@@ -107,10 +107,10 @@ neg (LR ls c)
     (LZ{}, LR{}) -> add_KR (toR a)     b
     (LR{}, LR{}) -> add_KR      a      b
  where
-  add_KZ :: Rep c => Linear z r c KZ -> Linear z r c KZ -> Linear z r c KZ
+  add_KZ :: Rep c => Linear z r c 'KZ -> Linear z r c 'KZ -> Linear z r c 'KZ
   add_KZ (LZ ls lc) (LZ rs rc) = LZ (ls ++ rs) (lc + rc)
 
-  add_KR :: Rep c => Linear z r c KR -> Linear z r c KR -> Linear z r c KR
+  add_KR :: Rep c => Linear z r c 'KR -> Linear z r c 'KR -> Linear z r c 'KR
   add_KR (LR ls lc) (LR rs rc) = LR (ls ++ rs) (lc + rc)
 
 

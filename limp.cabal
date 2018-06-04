@@ -1,5 +1,5 @@
 name:                limp
-version:             0.3.2.1
+version:             0.3.2.2
 synopsis:            representation of Integer Linear Programs
 description:         so far, this package just provides two representations for linear programs: "Numeric.Limp.Program", which is what I expect end-users to use, and
                      "Numeric.Limp.Canon", which is simpler, but would be less nice for writing linear programs.
@@ -53,7 +53,7 @@ library
         Numeric.Limp.Solve.Branch.Simple
 
   build-depends:
-        base        < 5,
+        base        >= 4.9 && < 4.12,
         containers  == 0.5.*
 
   ghc-options: -Wall -fno-warn-orphans

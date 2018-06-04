@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 -- | The simplest, stupidest possible branch and bound algorithm.
 --
 --
@@ -8,10 +9,12 @@ import Numeric.Limp.Canon.Program
 import Numeric.Limp.Canon.Simplify
 import Numeric.Limp.Rep
 
-import Control.Applicative
 import Control.Monad
 import qualified Data.Map as M
-import Data.Monoid
+
+#if MIN_VERSION_base(4,9,0) && !MIN_VERSION_base(4,11,0)
+import Data.Semigroup
+#endif
 
 branch
     :: (Ord z, Ord r, Rep c)

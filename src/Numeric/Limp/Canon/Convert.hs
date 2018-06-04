@@ -12,7 +12,6 @@ import qualified Numeric.Limp.Program.Constraint as P
 import qualified Numeric.Limp.Program.Linear     as P
 import qualified Numeric.Limp.Program.Program    as P
 
-import Control.Applicative
 import qualified Data.Map as M
 
 

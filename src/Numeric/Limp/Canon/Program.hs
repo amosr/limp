@@ -55,7 +55,7 @@ checkProgram a p
 
 checkBounds :: (Rep c, Ord z, Ord r) => Assignment z r c -> Map (Either z r) (Maybe (R c), Maybe (R c)) -> Bool
 checkBounds ass bs
- =  M.fold (&&) True (M.mapWithKey checkB bs)
+ =  M.foldr (&&) True (M.mapWithKey checkB bs)
  where
   checkB k (lo,up)
    = let v = zrOf ass k

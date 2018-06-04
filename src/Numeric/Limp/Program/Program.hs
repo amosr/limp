@@ -24,7 +24,7 @@ data Program z r c
    -- | Optimisation direction
      _direction     :: Direction
    -- | The objective function
-   , _objective     :: Linear z r c KR
+   , _objective     :: Linear z r c 'KR
    -- | All constraints bundled up with @:&&@.
    , _constraints   :: Constraint z r c
    -- | Upper and lower bounds of variables.

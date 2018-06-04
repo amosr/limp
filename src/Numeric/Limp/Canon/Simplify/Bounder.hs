@@ -6,7 +6,6 @@ import Numeric.Limp.Canon.Program
 import Numeric.Limp.Rep
 import Numeric.Limp.Error
 
-import Control.Applicative
 import Data.Either
 import qualified Data.Map as M
 
