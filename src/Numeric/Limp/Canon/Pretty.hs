@@ -21,7 +21,8 @@ ppr pZ pR p
  , "Bounds"
  , pprBs $ _bounds p
  , "Generals"
- , pprGs $ varsOfProgram p ]
+ , pprGs $ varsOfProgram p
+ , "End" ]
 
  where
   indent = ("\t"++)
