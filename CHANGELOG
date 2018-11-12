@@ -1,0 +1,30 @@
+0.3.2.3, 2018/11/13:
+  * Fix pretty-printing bug: printed programs did not include final 'End' line, so cbc could not parse the programs
+  * Relax the upper bound for containers dependency (contributed by @fumieval)
+  * Update test dependencies
+  * Update package description
+
+0.3.2.2, 2018/06/04:
+  * Build -Wall clean with GHC 8.4.3
+  * Relax the upper bound for base dependency
+  * Add missing semigroup instances (contributed by @fumieval)
+
+0.3.2.1, 2015/07/21:
+  * Naive implementations of two solving algorithms:
+    * Branch-and-bound algorithm for mixed programs
+    * Simplex algorithm for relaxed (real) programs
+  * Add tests to package description
+
+0.3.2.0, 2014/11/02:
+  * Error handling for simplifier
+
+0.3.1.0, 2014/09/19:
+  * Simplifier for Canon programs
+  * Pretty-printer for Canon programs
+
+0.3.0.0, 2014/09/03:
+  * Simplify Canonical representation
+  * Add evaluator for Program representation
+
+0.1.0.0, 2014/06/04:
+  * Initial release
