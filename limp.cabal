@@ -16,6 +16,7 @@ category:            Numeric
 build-type:          Simple
 cabal-version:       >=1.10
 homepage:            https://github.com/amosr/limp
+extra-source-files:  README.md changelog
 
 
 source-repository head
